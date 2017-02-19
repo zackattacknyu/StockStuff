@@ -62,7 +62,7 @@ for i = 1:length(trainDataAdj)
 end
 Ydata = trainDataTarget(goodInds);
 symbolsUsed = Symbol(goodInds);
-%%
+
 
 randInds = randperm(length(symbolsUsed));
 numTrain = floor(length(symbolsUsed)*0.8);
@@ -73,40 +73,47 @@ Xtrain = XdataOther(trainInds,:);
 Xtest = XdataOther(testInds,:);
 Ytrain = Ydata(trainInds);
 Ytest = Ydata(testInds);
+
+
+save('TrainTestData4.mat','Xtrain','Xtest','Ytrain','Ytest');
 %%
 
-
-
-%%
-
-save('TrainTestData3.mat','Xtrain','Xtest','Ytrain','Ytest');
-%%
+load('stockResults3.mat');
 
 %rmse if random guess
-YdataRand = randn(size(Ydata)).*0.025;
-sqrt(sum((Ydata-YdataRand).^2)/length(Ydata))
+%YdataRand = randn(size(Ydata)).*0.025;
+%sqrt(sum((Ydata-YdataRand).^2)/length(Ydata))
 %rmse of random guess: 0.0524
 %rmse with xgboost: 0.03
 
-%%
 
 [~,II] = sort(Ytest);
+[~,II2] = sort(yHatTest);
 
 figure
 hold on
 plot(Ytest(II),'k-')
-plot(yHatTest(II),'r-')
+plot(yHatTest(II),'ro')
 plot(zeros(1,100),'g--')
 legend('Actual Stock Price Change','Predicted Stock Price Change');
 hold off
 
+figure
+hold on
+plot(Ytest(II2),'ko')
+plot(yHatTest(II2),'r-')
+plot(zeros(1,100),'g--')
+legend('Actual Stock Price Change','Predicted Stock Price Change');
+hold off
 
-
-%%
-ii = find(yHatTest>0.03);
+ii = find(yHatTest>0.04);
 originalInds = goodInds(testInds(ii));
 
+ii2 = find(yHatTest<-0.05);
+origInds2 = goodInds(testInds(ii2));
+
 moneyMade = 0;
+moneySpent = 0;
 
 for jj = originalInds
     curSymbol = symbols(jj);
@@ -117,5 +124,21 @@ for jj = originalInds
     end
     targetData = Close(curTargetInds);
     moneyMade = moneyMade + (targetData(2)-targetData(1));
+    moneySpent = moneySpent + targetData(1);
+end
+
+for jj = origInds2
+    curSymbol = symbols(jj);
+    symbolInds = find(strcmp(Symbol,curSymbol));
+    curTargetInds = intersect(targetInds,symbolInds);
+    if(length(curTrainInds)<1 || length(curTargetInds) < 2)
+       continue 
+    end
+    targetData = Close(curTargetInds);
+    moneyMade = moneyMade + (targetData(1)-targetData(2));
+    moneySpent = moneySpent + targetData(2);
 end
 moneyMade
+moneySpent
+
+ROI=moneyMade/moneySpent
