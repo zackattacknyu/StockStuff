@@ -40,17 +40,22 @@ for ii = 1:length(symbols)
     XdataOther(ii,1)=min(curTrain(:,1));
     XdataOther(ii,2)=max(curTrain(:,1));
     XdataOther(ii,3)=mean(curTrain(:,1));
+    XdataOther(ii,4)=std(curTrain(:,1));
     
-    XdataOther(ii,4)=min(curTrain(:,2));
-    XdataOther(ii,5)=max(curTrain(:,2));
-    XdataOther(ii,6)=mean(curTrain(:,2));
+    XdataOther(ii,5)=min(curTrain(:,2));
+    XdataOther(ii,6)=max(curTrain(:,2));
+    XdataOther(ii,7)=mean(curTrain(:,2));
+    XdataOther(ii,8)=std(curTrain(:,2));
     
-    XdataOther(ii,7)=min(curTrain(:,5));
-    XdataOther(ii,8)=max(curTrain(:,5));
-    XdataOther(ii,9)=mean(curTrain(:,5));
+    XdataOther(ii,9)=min(curTrain(:,5));
+    XdataOther(ii,10)=max(curTrain(:,5));
+    XdataOther(ii,11)=mean(curTrain(:,5));
+    XdataOther(ii,12)=std(curTrain(:,5));
     
-    XdataOther(ii,10)=min(curTrain(:,3));
-    XdataOther(ii,11)=max(curTrain(:,4));
+    XdataOther(ii,13)=min(curTrain(:,3));
+    XdataOther(ii,14)=max(curTrain(:,4));
+    
+    %NOTE: INCLUDE THE STD MADE THE RMSE GO FROM 0.038 TO 0.036
 end
 
 XdataOther = XdataOther(goodInds,:);
@@ -65,7 +70,7 @@ symbolsUsed = Symbol(goodInds);
 
 
 randInds = randperm(length(symbolsUsed));
-numTrain = floor(length(symbolsUsed)*0.8);
+numTrain = floor(length(symbolsUsed)*0.9);
 trainInds = randInds(1:numTrain);
 testInds = randInds(numTrain+1:end);
 
@@ -75,10 +80,10 @@ Ytrain = Ydata(trainInds);
 Ytest = Ydata(testInds);
 
 
-save('TrainTestData4.mat','Xtrain','Xtest','Ytrain','Ytest');
+save('TrainTestData7.mat','Xtrain','Xtest','Ytrain','Ytest');
 %%
 
-load('stockResults3.mat');
+load('stockResults7.mat');
 
 %rmse if random guess
 %YdataRand = randn(size(Ydata)).*0.025;
@@ -105,11 +110,11 @@ plot(yHatTest(II2),'r-')
 plot(zeros(1,100),'g--')
 legend('Actual Stock Price Change','Predicted Stock Price Change');
 hold off
-
-ii = find(yHatTest>0.04);
+%%
+ii = find(yHatTest>0.01);
 originalInds = goodInds(testInds(ii));
 
-ii2 = find(yHatTest<-0.05);
+ii2 = find(yHatTest<-0.04);
 origInds2 = goodInds(testInds(ii2));
 
 moneyMade = 0;
